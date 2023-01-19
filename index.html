@@ -176,11 +176,68 @@
       },
     ];
 
+    const query = "{spaces{id name open}}";
+    const body = JSON.stringify({ query });
+    const gql = async() => {
+      try {
+        const res = await fetch("https://spaceapi.ryzetech.live/graphql?", {
+          headers: { "content-type": "application/json" },
+          body,
+          method: "POST",
+          mode: "cors"
+        });
+        const { data: { spaces } } = await res.json();
+        console.info({ spaces });
+      } catch (e) {
+        console.error({e});
+      }
+    };
+
+    const res = [
+      {
+        "id": "unhb",
+        "name": null,
+        "open": false
+      },
+      {
+        "id": "ctdo",
+        "name": null,
+        "open": false
+      },
+      {
+        "id": "chaospott",
+        "name": null,
+        "open": true
+      },
+      {
+        "id": "cccaachen",
+        "name": null,
+        "open": false
+      },
+      {
+        "id": "ccckoeln",
+        "name": null,
+        "open": true
+      },
+      {
+        "id": "hasi",
+        "name": null,
+        "open": true
+      },
+      {
+        "id": "warpzone",
+        "name": null,
+        "open": true
+      }
+    ];
+
     const getStatuses = async() => statusFetchers.map(fn => fn());
 
     // fetch once and then every 20 seconds
     getStatuses();
     setInterval(getStatuses, 20000);
+
+    gql();
   </script>
 </body>
 </html>
