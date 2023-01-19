@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Status der Hackerspaces</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="manifest" href="meta/site.webmanifest">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#000000">
+  <style>
+    body { background-color: black; width: 100%; margin: 0; font: bold 22px monospace; color: lime; }
+    main { max-width: 480px; position: relative; }
+    .map {
+      filter: invert(1);
+      max-width: 450px;
+    }
+    figure {
+      width: 480px;
+      margin: 5px 0;
+    }
+    figcaption {
+      font-size: 12px;
+      padding: 0 15px;
+    }
+    a { color: lime; text-decoration: none; display: grid; grid-template-columns: 1fr 1fr 40px; align-items: center; margin: 15px; gap: 12px; }
+    a.space img, div { height: 40px; }
+    .logo { text-align: center; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="space" href="https://www.das-labor.org">
+      Das Labor
+      <span class="logo">
+      <img src="https://www.das-labor.org/images/LaborLogoBootstrapped.png" alt="Das Labor" />
+      </span>
+      <img src="https://www.das-labor.org/status/status_img.php" alt="Das Labor" />
+    </a>
+    <a class="space" href="http://die-foobar.de/">
+      Chaospott
+      <span class="logo">
+      <img src="https://chaospott.de/images/logo.svg" alt="Chaospott" />
+      </span>
+      <div style="background-color: orange" id="chaospott"></div>
+    </a>
+    <a class="space" href="https://chaosdorf.de" style="">
+      Chaosdorf
+      <span class="logo">
+      <img style="filter: invert(100%);" src="https://wiki.chaosdorf.de/images/1/1d/ChaosdorfLogo.svg" alt="Chaosdorf" />
+      </span>
+      <img src="https://chaosdorf.de/raumstatus/status.png" alt="Chaosdorf" />
+    </a>
+    <a class="space" href="https://aachen.ccc.de">
+      CCCAC
+      <span class="logo">
+      <img src="https://aachen.ccc.de/images/cccac_logo_bw_kleiner.png" alt="CCCAC" />
+      </span>
+      <div style="background-color: orange" id="cccaachen"></div>
+    </a>
+    <a class="space" href="https://koeln.ccc.de/">
+      c4
+      <span class="logo">
+      <img style="filter:invert(100%)" src="https://koeln.ccc.de/images/c4-logo.svg" alt="CCC Cologne" />
+      </span>
+      <div style="background-color: orange" id="ccccologne"></div>
+    </a>
+    <a class="space" href="https://www.hasi.it/">
+      HaSi
+      <span class="logo">
+      <img src="https://wiki.hasi.it/images/e/ee/PixelhasiLogo.png" alt="HaSi" />
+      </span>
+      <div style="background-color: orange" id="hasi"></div>
+    </a>
+    <a class="space" href="https://www.warpzone.ms/">
+      Warpzone
+      <span class="logo">
+      <img style="filter:invert(100%); width: 100%; height: auto;" src="https://www.warpzone.ms/wp-content/uploads/2013/11/cropped-cropped-cropped-cropped-warpzone_schriftzug.png" alt="Warpzone" />
+      </span>
+      <div style="background-color: orange" id="warpzone"></div>
+    </a>
+    <a class="space" href="https://www.chaostreff-dortmund.de/">
+      CTDO
+      <span class="logo">
+      <img style="width: 100%; height: auto;" src="https://www.chaostreff-dortmund.de/wp-content/uploads/2014/07/schriftzugchaostreff_weiss.png" alt="Chaostreff Dortmund" />
+      </span>
+      <div style="background-color: orange" id="ctdo"></div>
+    </a>
+    <a class="space" href="https://www.un-hack-bar.de/">
+      UN-Hack-Bar
+      <span class="logo">
+      <img style="filter: brightness(0) invert(1)" src="https://matrix.un-hack-bar.de/_matrix/media/v1/download/matrix.un-hack-bar.de/xcmwcXGdQqlgkcKxUROTndHL" alt="UN-Hack-Bar" />
+      </span>
+      <div style="background-color: orange" id="unhb"></div>
+    </a>
+    <figure>
+      <a href="https://commons.wikimedia.org/wiki/File:Nordrhein-Westfalen,_administrative_divisions_%28districts_only%29_-_de_-_colored.svg">
+        <img class="map" src="https://upload.wikimedia.org/wikipedia/commons/1/10/Nordrhein-Westfalen%2C_administrative_divisions_%28districts_only%29_-_de_-_colored.svg" alt="map of NRW" />
+      </a>
+      <figcaption>
+        map by TUBS, CC BY-SA 3.0, via Wikimedia Commons
+      </figcaption>
+    </figure>
+  </main>
+  <script>
+    const setBg = (selector, open) => {
+      document.querySelector(selector).style.backgroundColor = open ? '#00ff00' : '#ff0000';
+    };
+
+    const statusFetchers = [
+      async () => {
+        try {
+          const res = await fetch('https://keinanschluss.unhb.de/spaceapi.json');
+          const { state } = await res.json();
+          setBg('#unhb', state.open);
+        } catch (e) {
+          console.error('Could not get status for UNHB', e);
+        }
+      },
+      async () => {
+        try {
+          const res = await fetch('https://status.ctdo.de/api/spaceapi/v13');
+          const { state } = await res.json();
+          setBg('#ctdo', state.open);
+        } catch (e) {
+          console.error('Could not get status for CTDO', e);
+        }
+      },
+      async () => {
+        try {
+          const res = await fetch('https://status.chaospott.de/status.json');
+          const { state } = await res.json();
+          setBg('#chaospott', state.open);
+        } catch (e) {
+          console.error('Could not get status for Chaospott', e);
+        }
+      },
+      async () => {
+        try {
+          const res = await fetch('https://status.aachen.ccc.de/api/v0/status/current?public');
+          const { changed } = await res.json();
+          setBg('#cccaachen', changed.status === 'public');
+        } catch (e) {
+          console.error('Could not get status for CCCAC', e);
+        }
+      },
+      async () => {
+        const res = await fetch('https://api.koeln.ccc.de');
+        try {
+          const { state } = await res.json();
+          setBg('#ccccologne', state.open);
+        } catch (e) {
+          console.error('Could not get status for c4', e);
+        }
+      },
+      async () => {
+        const res = await fetch('https://status.hasi.it/');
+        try {
+          const { state } = await res.json();
+          setBg('#hasi', state.open);
+        } catch (e) {
+          console.error('Could not get status for HaSi', e);
+        }
+      },
+      async () => {
+        const res = await fetch('https://api.warpzone.ms/status');
+        try {
+          const { tuerOffen } = await res.json();
+          setBg('#warpzone', tuerOffen);
+        } catch (e) {
+          console.error('Could not get status for Warpzone', e);
+        }
+      },
+    ];
+
+    const getStatuses = async() => statusFetchers.map(fn => fn());
+
+    // fetch once and then every 20 seconds
+    getStatuses();
+    setInterval(getStatuses, 20000);
+  </script>
+</body>
+</html>
