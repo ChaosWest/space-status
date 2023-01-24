@@ -66,7 +66,7 @@
       <span class="logo">
       <img style="filter:invert(100%)" src="https://koeln.ccc.de/images/c4-logo.svg" alt="CCC Cologne" />
       </span>
-      <div style="background-color: orange" id="ccccologne"></div>
+      <div style="background-color: orange" id="ccckoeln"></div>
     </a>
     <a class="space" href="https://www.hasi.it/">
       HaSi
@@ -110,73 +110,7 @@
       document.querySelector(selector).style.backgroundColor = open ? '#00ff00' : '#ff0000';
     };
 
-    const statusFetchers = [
-      async () => {
-        try {
-          const res = await fetch('https://keinanschluss.unhb.de/spaceapi.json');
-          const { state } = await res.json();
-          setBg('#unhb', state.open);
-        } catch (e) {
-          console.error('Could not get status for UNHB', e);
-        }
-      },
-      async () => {
-        try {
-          const res = await fetch('https://status.ctdo.de/api/spaceapi/v13');
-          const { state } = await res.json();
-          setBg('#ctdo', state.open);
-        } catch (e) {
-          console.error('Could not get status for CTDO', e);
-        }
-      },
-      async () => {
-        try {
-          const res = await fetch('https://status.chaospott.de/status.json');
-          const { state } = await res.json();
-          setBg('#chaospott', state.open);
-        } catch (e) {
-          console.error('Could not get status for Chaospott', e);
-        }
-      },
-      async () => {
-        try {
-          const res = await fetch('https://status.aachen.ccc.de/api/v0/status/current?public');
-          const { changed } = await res.json();
-          setBg('#cccaachen', changed.status === 'public');
-        } catch (e) {
-          console.error('Could not get status for CCCAC', e);
-        }
-      },
-      async () => {
-        const res = await fetch('https://api.koeln.ccc.de');
-        try {
-          const { state } = await res.json();
-          setBg('#ccccologne', state.open);
-        } catch (e) {
-          console.error('Could not get status for c4', e);
-        }
-      },
-      async () => {
-        const res = await fetch('https://status.hasi.it/');
-        try {
-          const { state } = await res.json();
-          setBg('#hasi', state.open);
-        } catch (e) {
-          console.error('Could not get status for HaSi', e);
-        }
-      },
-      async () => {
-        const res = await fetch('https://api.warpzone.ms/status');
-        try {
-          const { tuerOffen } = await res.json();
-          setBg('#warpzone', tuerOffen);
-        } catch (e) {
-          console.error('Could not get status for Warpzone', e);
-        }
-      },
-    ];
-
-    const query = "{spaces{id name open}}";
+    const query = "{ inArea(area: \"DE-NW\") { id open } }";
     const body = JSON.stringify({ query });
     const gql = async() => {
       try {
@@ -186,58 +120,18 @@
           method: "POST",
           mode: "cors"
         });
-        const { data: { spaces } } = await res.json();
-        console.info({ spaces });
+        const { data: { inArea }} = await res.json();
+        for (const { id, open } of inArea) {
+          setBg(`#${id}`, open);
+        }
       } catch (e) {
         console.error({e});
       }
     };
 
-    const res = [
-      {
-        "id": "unhb",
-        "name": null,
-        "open": false
-      },
-      {
-        "id": "ctdo",
-        "name": null,
-        "open": false
-      },
-      {
-        "id": "chaospott",
-        "name": null,
-        "open": true
-      },
-      {
-        "id": "cccaachen",
-        "name": null,
-        "open": false
-      },
-      {
-        "id": "ccckoeln",
-        "name": null,
-        "open": true
-      },
-      {
-        "id": "hasi",
-        "name": null,
-        "open": true
-      },
-      {
-        "id": "warpzone",
-        "name": null,
-        "open": true
-      }
-    ];
-
-    const getStatuses = async() => statusFetchers.map(fn => fn());
-
     // fetch once and then every 20 seconds
-    getStatuses();
-    setInterval(getStatuses, 20000);
-
     gql();
+    setInterval(gql, 20000);
   </script>
 </body>
 </html>
