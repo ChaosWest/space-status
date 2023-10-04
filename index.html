@@ -82,6 +82,13 @@
       </span>
       <div style="background-color: orange" id="warpzone"></div>
     </a>
+    <a class="space" href="https://c3re.de/">
+      c3RE
+      <span class="logo">
+      <img style="filter: saturate(0) contrast(500%);" src="https://c3re.de/doorstatus/open.png" alt="c3RE" />
+      </span>
+      <div style="background-color: orange" id="c3re"></div>
+    </a>
     <a class="space" href="https://www.chaostreff-dortmund.de/">
       CTDO
       <span class="logo">
@@ -172,6 +179,15 @@
           setBg('#warpzone', tuerOffen);
         } catch (e) {
           console.error('Could not get status for Warpzone', e);
+        }
+      },
+      async () => {
+        const res = await fetch('https://spaceapi.c3re.de/');
+        try {
+          const { state } = await res.json();
+          setBg('#c3re', state.open);
+        } catch (e) {
+          console.error('Could not get status for c3RE', e);
         }
       },
     ];
